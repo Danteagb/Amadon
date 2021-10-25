@@ -1,5 +1,7 @@
 from django.shortcuts import render,redirect 
 from .models import Order, Product
+# from . import team_maker
+from django.db.models import Sum
 
 def index(request):
     if request.method=="GET":
@@ -17,7 +19,11 @@ def index(request):
         return redirect("/checkout")
 
 def checkout(request):
+    final_price =Order.objects.aggregate(final_sum=Sum("total_price"))
+    num_items =Order.objects.aggregate(final_quantity=Sum("quantity_ordered"))
     context={
-    "last_order": Order.objects.last()
+    "last_order": Order.objects.last(),
+    "final_sum": final_price['final_sum'],
+    "final_quantity": num_items['final_quantity']
 }
     return render(request, "store/checkout.html",context)
